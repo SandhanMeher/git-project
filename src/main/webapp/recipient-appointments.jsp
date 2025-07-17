@@ -107,8 +107,11 @@
 				</h:column>
 
 				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Actions" />
+					</f:facet>
 					<h:commandButton value="Cancel"
-						rendered="#{appt.status eq 'BOOKED' || appt.status eq 'PENDING'}"
+						rendered="#{recipientAppointmentController.cancellableMap[appt.appointment_id]}"
 						onclick="return showLoadingAndConfirm();"
 						action="#{recipientAppointmentController.cancelAppointment}"
 						styleClass="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
@@ -116,7 +119,9 @@
 							target="#{recipientAppointmentController.selectedAppointment}"
 							value="#{appt}" />
 					</h:commandButton>
+
 				</h:column>
+
 			</h:dataTable>
 
 			<!-- No appointments message -->
