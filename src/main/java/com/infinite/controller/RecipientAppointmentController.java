@@ -3,7 +3,6 @@ package com.infinite.controller;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -15,6 +14,7 @@ import com.infinite.dao.DoctorDaoImpl;
 import com.infinite.dao.RecipientDaoImpl;
 import com.infinite.model.Appointment;
 import com.infinite.model.AppointmentSlip;
+import com.infinite.model.AppointmentStatus;
 import com.infinite.model.Doctors;
 import com.infinite.model.Recipient;
 import com.infinite.util.MailSend;
@@ -27,13 +27,15 @@ public class RecipientAppointmentController implements Serializable {
 
 	private final AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
 
-	private String hId = "H1003"; // This should ideally come from session/login
+	private String hId = "H1003"; // from session ideally
 
 	private List<Appointment> upcomingAppointments = new ArrayList<>();
 	private List<Appointment> pastAppointments = new ArrayList<>();
 	private List<Appointment> filteredAppointments = new ArrayList<>();
 
-	private String filterType = "upcoming"; // default filter
+	private String timeFilterType = "future"; // future or past
+	private String statusFilterType = "ALL"; // ALL, PENDING, BOOKED, CANCELLED, COMPLETED
+
 	private Appointment selectedAppointment;
 
 	@PostConstruct
@@ -45,20 +47,27 @@ public class RecipientAppointmentController implements Serializable {
 		try {
 			upcomingAppointments = appointmentDao.getUpcomingAppointmentsByRecipient(hId);
 			pastAppointments = appointmentDao.getPastAppointmentsByRecipient(hId);
-			updateFilteredAppointments(); // initial filter
+			updateFilteredAppointments();
 		} catch (Exception e) {
 			System.err.println("Error loading appointments: " + e.getMessage());
-			upcomingAppointments = new ArrayList<>();
-			pastAppointments = new ArrayList<>();
-			filteredAppointments = new ArrayList<>();
+			upcomingAppointments.clear();
+			pastAppointments.clear();
+			filteredAppointments.clear();
 		}
 	}
 
 	public void updateFilteredAppointments() {
-		if ("past".equals(filterType)) {
-			filteredAppointments = new ArrayList<>(pastAppointments);
+		List<Appointment> baseList = "past".equalsIgnoreCase(timeFilterType) ? pastAppointments : upcomingAppointments;
+
+		if ("ALL".equalsIgnoreCase(statusFilterType)) {
+			filteredAppointments = new ArrayList<>(baseList);
 		} else {
-			filteredAppointments = new ArrayList<>(upcomingAppointments);
+			filteredAppointments = new ArrayList<>();
+			for (Appointment appt : baseList) {
+				if (appt.getStatus() != null && appt.getStatus().name().equalsIgnoreCase(statusFilterType)) {
+					filteredAppointments.add(appt);
+				}
+			}
 		}
 	}
 
@@ -71,34 +80,29 @@ public class RecipientAppointmentController implements Serializable {
 						.searchRecipientById(selectedAppointment.getRecipient().getH_id());
 
 				if (success) {
-					// Load doctor info
 					Doctors doctor = new DoctorDaoImpl()
 							.searchADoctorById(selectedAppointment.getDoctor().getDoctor_id());
 
-					ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext()
-							.getContext();
+					ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance()
+							.getExternalContext().getContext();
 
 					String subject = "Appointment Cancelled – Infinite HealthSure";
 
-					AppointmentSlip apSli = new AppointmentSlip(
-							res.getFirst_name() + " " + res.getLast_name(),
-							selectedAppointment.getAppointment_id(),
-							"Infinite HealthSure Hospital",
+					AppointmentSlip slip = new AppointmentSlip(res.getFirst_name() + " " + res.getLast_name(),
+							selectedAppointment.getAppointment_id(), "Infinite HealthSure Hospital",
 							servletContext.getInitParameter("providerEmail"),
-							servletContext.getInitParameter("contact"),
-							doctor.getDoctor_name(),
-							doctor.getSpecialization(),
-							selectedAppointment.getStart().toString().split(" ")[0],
-							selectedAppointment.getSlot_no(),
-							selectedAppointment.getStart().toString().split(" ")[1] + " - " + selectedAppointment.getEnd().toString().split(" ")[1]);
+							servletContext.getInitParameter("contact"), doctor.getDoctor_name(),
+							doctor.getSpecialization(), selectedAppointment.getStart().toString().split(" ")[0],
+							selectedAppointment.getSlot_no(), selectedAppointment.getStart().toString().split(" ")[1]
+									+ " - " + selectedAppointment.getEnd().toString().split(" ")[1]);
 
 					try {
-						MailSend.sendInfo(res.getEmail(), subject, MailSend.appointmentCancellation(apSli));
+						MailSend.sendInfo(res.getEmail(), subject, MailSend.appointmentCancellation(slip));
 					} catch (Exception e) {
-						System.err.println("Error while sending cancellation email: " + e.getMessage());
+						System.err.println("Error sending cancellation email: " + e.getMessage());
 					}
 
-					loadAppointments(); // Refresh the lists
+					loadAppointments(); // reload with updates
 					return "recipient-appointments?faces-redirect=true";
 				}
 			} catch (Exception e) {
@@ -108,28 +112,28 @@ public class RecipientAppointmentController implements Serializable {
 		return null;
 	}
 
-
-	// ===================== GETTERS & SETTERS =====================
-
-	public List<Appointment> getUpcomingAppointments() {
-		return upcomingAppointments;
-	}
-
-	public List<Appointment> getPastAppointments() {
-		return pastAppointments;
-	}
+	// ====================== GETTERS & SETTERS =======================
 
 	public List<Appointment> getFilteredAppointments() {
 		return filteredAppointments;
 	}
 
-	public String getFilterType() {
-		return filterType;
+	public String getTimeFilterType() {
+		return timeFilterType;
 	}
 
-	public void setFilterType(String filterType) {
-		this.filterType = filterType;
-		updateFilteredAppointments(); // Automatically reapply filter
+	public void setTimeFilterType(String timeFilterType) {
+		this.timeFilterType = timeFilterType;
+		updateFilteredAppointments();
+	}
+
+	public String getStatusFilterType() {
+		return statusFilterType;
+	}
+
+	public void setStatusFilterType(String statusFilterType) {
+		this.statusFilterType = statusFilterType;
+		updateFilteredAppointments();
 	}
 
 	public Appointment getSelectedAppointment() {
