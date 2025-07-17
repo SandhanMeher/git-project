@@ -273,10 +273,12 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			Timestamp now = new Timestamp(System.currentTimeMillis());
 
 			Query query = session.createQuery("FROM Appointment a WHERE a.recipient.h_id = :recipientId "
-					+ "AND a.status IN ('BOOKED', 'PENDING') " + "AND a.start > :now ORDER BY a.start ASC");
+					+ "AND a.status IN ('BOOKED', 'PENDING', 'CANCELLED') "
+					+ "AND a.start > :now ORDER BY a.start ASC");
+
 			query.setParameter("recipientId", recipientId);
 			query.setParameter("now", now);
-			query.setMaxResults(10); // Only next 10 appointments allowed
+//			query.setMaxResults(10); // Only next 10 appointments allowed
 
 			@SuppressWarnings("unchecked")
 			List<Appointment> list = query.list();
