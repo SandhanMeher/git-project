@@ -14,6 +14,9 @@
 </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-6">
+	<!-- Navbar -->
+	<jsp:include page="NavBar.jsp" />
+
 	<div class="max-w-6xl mx-auto bg-white p-6 rounded shadow">
 		<h1 class="text-2xl font-bold mb-6 text-blue-700">My Appointments</h1>
 
