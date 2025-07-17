@@ -156,9 +156,11 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			// doctor
 			Query pendingWithDoctorQuery = session
 					.createQuery("FROM Appointment a WHERE a.recipient.h_id = :recipientId "
-							+ "AND a.doctor.doctor_id = :doctorId AND a.status = 'PENDING'");
+							+ "AND a.doctor.doctor_id = :doctorId AND a.status = 'PENDING'  AND a.start > :currentTime");
 			pendingWithDoctorQuery.setParameter("recipientId", recipientId);
 			pendingWithDoctorQuery.setParameter("doctorId", doctorId);
+			pendingWithDoctorQuery.setParameter("currentTime",  new Timestamp(System.currentTimeMillis()));
+			
 
 			List<Appointment> pendingAppointments = pendingWithDoctorQuery.list();
 			if (!pendingAppointments.isEmpty()) {
