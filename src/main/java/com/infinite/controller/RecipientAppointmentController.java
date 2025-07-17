@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletContext;
 
 import com.infinite.dao.AppointmentDaoImpl;
@@ -37,6 +38,22 @@ public class RecipientAppointmentController implements Serializable {
 	private String statusFilterType = "ALL"; // ALL, PENDING, BOOKED, CANCELLED, COMPLETED
 
 	private Appointment selectedAppointment;
+	
+
+	public List<SelectItem> getStatusFilterOptions() {
+		List<SelectItem> options = new ArrayList<>();
+		options.add(new SelectItem("ALL", "All"));
+		options.add(new SelectItem("PENDING", "Pending"));
+		options.add(new SelectItem("BOOKED", "Booked"));
+		options.add(new SelectItem("CANCELLED", "Cancelled"));
+
+		// Only add 'COMPLETED' if viewing past appointments
+		if ("past".equalsIgnoreCase(timeFilterType)) {
+			options.add(new SelectItem("COMPLETED", "Completed"));
+		}
+		return options;
+	}
+
 
 	@PostConstruct
 	public void init() {

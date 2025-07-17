@@ -13,7 +13,7 @@
 }
 </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-6">	
+<body class="bg-gray-100 min-h-screen p-6">
 	<div class="max-w-6xl mx-auto bg-white p-6 rounded shadow">
 		<h1 class="text-2xl font-bold mb-6 text-blue-700">My Appointments</h1>
 
@@ -55,12 +55,10 @@
 						value="#{recipientAppointmentController.statusFilterType}"
 						styleClass="border px-2 py-1 rounded w-full"
 						onchange="this.form.submit();">
-						<f:selectItem itemLabel="All" itemValue="ALL" />
-						<f:selectItem itemLabel="Pending" itemValue="PENDING" />
-						<f:selectItem itemLabel="Booked" itemValue="BOOKED" />
-						<f:selectItem itemLabel="Cancelled" itemValue="CANCELLED" />
-						<f:selectItem itemLabel="Completed" itemValue="COMPLETED" />
+						<f:selectItems
+							value="#{recipientAppointmentController.statusFilterOptions}" />
 					</h:selectOneMenu>
+
 				</div>
 			</div>
 
