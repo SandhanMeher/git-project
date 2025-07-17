@@ -51,7 +51,8 @@
 
 				<div>
 					<label for="statusFilter"
-						class="block text-gray-700 font-medium mb-1">Status Filter:</label>
+						class="block text-gray-700 font-medium mb-1">Status
+						Filter:</label>
 					<h:selectOneMenu id="statusFilter"
 						value="#{recipientAppointmentController.statusFilterType}"
 						styleClass="border px-2 py-1 rounded w-full"
@@ -60,10 +61,11 @@
 							value="#{recipientAppointmentController.statusFilterOptions}" />
 					</h:selectOneMenu>
 				</div>
-                <%-- Added Page Size filter --%>
-                <div>
+				<%-- Added Page Size filter --%>
+				<div>
 					<label for="pageSizeFilter"
-						class="block text-gray-700 font-medium mb-1">Items Per Page:</label>
+						class="block text-gray-700 font-medium mb-1">Items Per
+						Page:</label>
 					<h:selectOneMenu id="pageSizeFilter"
 						value="#{recipientAppointmentController.pageSize}"
 						styleClass="border px-2 py-1 rounded w-full"
@@ -102,8 +104,8 @@
 						<h:outputText value="Appointment Date" />
 					</f:facet>
 					<h:outputText value="#{appt.start}">
-                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm" /> <%-- Format for better readability --%>
-                    </h:outputText>
+						<f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+					</h:outputText>
 				</h:column>
 
 				<h:column>
@@ -159,7 +161,7 @@
 			<h:messages globalOnly="true"
 				infoClass="p-3 bg-green-100 text-green-700 border border-green-300 rounded mb-4"
 				errorClass="p-3 bg-red-100 text-red-700 border border-red-300 rounded mb-4"
-                warnClass="p-3 bg-yellow-100 text-yellow-700 border border-yellow-300 rounded mb-4"/>
+				warnClass="p-3 bg-yellow-100 text-yellow-700 border border-yellow-300 rounded mb-4" />
 		</h:form>
 	</div>
 	<script>
